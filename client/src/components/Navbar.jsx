@@ -3,26 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/userContext';
 
 export default function Navbar() {
-    const navigate = useNavigate();
-    const { Username, Role } = useUser();
-    console.log("Username: ", Username);
+    // const navigate = useNavigate();
+    // const { Username, Role } = useUser();
+    // console.log("Username: ", Username);
     const location = useLocation();
-    console.log("location:", location);
+    // console.log("location:", location);
 
-    const handleAuth = () => {
-        if (Username) {
-            navigate("/signin")
-        } else {
-            navigate("/signin")
-        }
-    };
-
-    useEffect(() => {
-        console.log("Username and Role:", Username);
-        if (!Username) {
-            navigate("/signin")
-        }
-    })
 
     if (location.pathname != "/") return null;
 
