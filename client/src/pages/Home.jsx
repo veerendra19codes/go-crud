@@ -1,21 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { useUser } from '../contexts/userContext';
-
-const initialPatients = [
-    {
-        id: 1,
-        fullName: 'John Doe',
-        registeredDateTime: '2023-05-20T10:30:00',
-        symptoms: 'Fever, Cough',
-        dob: '1990-01-15',
-        gender: 'Male',
-        contactNumber: '123-456-7890',
-        address: '123 Main St, City, Country',
-        emergencyContactNumber: '987-654-3210',
-        reasonForVisit: 'Flu-like symptoms'
-    }
-];
+import axios from 'axios';
 
 function PatientForm({ patient, onSave, onCancel }) {
     const [formData, setFormData] = useState(patient || {
@@ -42,6 +28,7 @@ function PatientForm({ patient, onSave, onCancel }) {
         e.preventDefault();
         onSave(formData);
     };
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[500px] overflow-y-auto">
@@ -175,7 +162,7 @@ function PatientForm({ patient, onSave, onCancel }) {
 }
 
 export default function Home() {
-    const [patients, setPatients] = useState(initialPatients);
+    const [patients, setPatients] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPatient, setEditingPatient] = useState(null);
     const dialogRef = useRef(null);
@@ -225,6 +212,20 @@ export default function Home() {
         setIsDialogOpen(false);
     };
 
+
+    useEffect(() => {
+        const fetchAllPatients = async () => {
+
+            axios.get(`${import.meta.env.VITE_BACKEND_URL}/patients`)
+                .then((res) => {
+                    console.log("res: ", res);
+                    setPatients(res.data.patients);
+                })
+                .catch((error) => console.log("error: ", error))
+        }
+        fetchAllPatients();
+    }, [])
+
     return (
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-4">
@@ -256,17 +257,17 @@ export default function Home() {
                     </thead>
                     <tbody>
                         {patients.map((patient) => (
-                            <tr key={patient.id} className="hover:bg-gray-50">
-                                <td className="py-2 px-4 border-b">{patient.id}</td>
-                                <td className="py-2 px-4 border-b">{patient.fullName}</td>
-                                <td className="py-2 px-4 border-b">{new Date(patient.registeredDateTime).toLocaleString()}</td>
-                                <td className="py-2 px-4 border-b">{patient.symptoms}</td>
-                                <td className="py-2 px-4 border-b">{patient.dob}</td>
-                                <td className="py-2 px-4 border-b">{patient.gender}</td>
-                                <td className="py-2 px-4 border-b">{patient.contactNumber}</td>
-                                <td className="py-2 px-4 border-b">{patient.address}</td>
-                                <td className="py-2 px-4 border-b">{patient.emergencyContactNumber}</td>
-                                <td className="py-2 px-4 border-b">{patient.reasonForVisit}</td>
+                            <tr key={patient.ID} className="hover:bg-gray-50">
+                                <td className="py-2 px-4 border-b">{patient.ID}</td>
+                                <td className="py-2 px-4 border-b">{patient.FullName}</td>
+                                <td className="py-2 px-4 border-b">{new Date(patient.RegisteredDateTime).toLocaleString()}</td>
+                                <td className="py-2 px-4 border-b">{patient.Symptoms}</td>
+                                <td className="py-2 px-4 border-b">{patient.Dob}</td>
+                                <td className="py-2 px-4 border-b">{patient.Gender}</td>
+                                <td className="py-2 px-4 border-b">{patient.ContactNumber}</td>
+                                <td className="py-2 px-4 border-b">{patient.Address}</td>
+                                <td className="py-2 px-4 border-b">{patient.EmergencyContactNumber}</td>
+                                <td className="py-2 px-4 border-b">{patient.ReasonForVisit}</td>
                                 <td className="py-2 px-4 border-b">
                                     <button
                                         onClick={() => handleEditPatient(patient)}

@@ -43,6 +43,7 @@ export default function Signin() {
             }
         } catch (error) {
             console.log("error", error);
+            alert(error.response.data.error);
         }
         // Reset form after submission
         setFormData({ Username: '', Password: '' });

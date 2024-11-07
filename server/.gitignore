@@ -24,3 +24,5 @@ vendor/
 # OS-specific files
 Thumbs.db
 ehthumbs.db
+
+.env

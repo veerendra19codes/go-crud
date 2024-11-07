@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/veerendra19codes/jwt-auth/initializers"
-	"github.com/veerendra19codes/jwt-auth/models"
+	"github.com/veerendra19codes/server/initializers"
+	"github.com/veerendra19codes/server/models"
 )
 
 func RequireAuth(c *gin.Context) {

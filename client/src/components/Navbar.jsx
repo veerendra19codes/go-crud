@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/userContext';
 
 export default function Navbar() {
     const navigate = useNavigate();
     const { Username, Role } = useUser();
     console.log("Username: ", Username);
+    const location = useLocation();
+    console.log("location:", location);
 
     const handleAuth = () => {
         if (Username) {
@@ -14,6 +16,15 @@ export default function Navbar() {
             navigate("/signin")
         }
     };
+
+    useEffect(() => {
+        console.log("Username and Role:", Username);
+        if (!Username) {
+            navigate("/signin")
+        }
+    })
+
+    if (location.pathname != "/") return null;
 
     return (
         <nav className="bg-gray-800 p-4">

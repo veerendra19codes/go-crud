@@ -1,14 +1,14 @@
 package main
 
 import (
+	"log"
+	"net/http"
 	"os"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/veerendra19codes/jwt-auth/controllers"
-	"github.com/veerendra19codes/jwt-auth/initializers"
-	"github.com/veerendra19codes/jwt-auth/middleware"
+	"github.com/veerendra19codes/server/controllers"
+	"github.com/veerendra19codes/server/initializers"
+	"github.com/veerendra19codes/server/middleware"
 )
 
 func init() {
@@ -20,18 +20,40 @@ func init() {
 func main() {
 	r := gin.Default()
 
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{os.Getenv("FRONTEND_URL")},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	r.Use(CORSMiddleware())
 
 	r.POST("/signup", controllers.SignUp)
 	r.POST("/login", controllers.Login)
 	r.POST("/validate", middleware.RequireAuth, controllers.Validate)
-
+	r.POST("/newpatient", controllers.NewPatient)
+	r.GET("/patients", controllers.GetAllPatients)
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello",
+		})
+	})
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3001"
+	}
+	if err := r.Run(":" + port); err != nil {
+		log.Panicf("error: %s", err)
+	}
 	r.Run()
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }

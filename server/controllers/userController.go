@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/veerendra19codes/jwt-auth/initializers"
-	"github.com/veerendra19codes/jwt-auth/models"
+	"github.com/veerendra19codes/server/initializers"
+	"github.com/veerendra19codes/server/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -150,5 +150,68 @@ func Validate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Im logged In",
 		"user":    user,
+	})
+}
+
+func NewPatient(c *gin.Context) {
+	//get body from req
+	var body struct {
+		FullName               string    `json:"fullname"`
+		RegisteredDateTime     time.Time `json:"registeredDateTime"`
+		Symptoms               string    `json:"symptoms"`
+		Dob                    string    `json:"dob"`
+		Gender                 string    `json:"gender"`
+		ContactNumber          string    `json:"contactNumber"`
+		Address                string    `json:"address"`
+		EmergencyContactNumber string    `json:"emergencyContactNumber"`
+		ReasonForVisit         string    `json:"reasonForVisit"`
+	}
+
+	// add in the db
+	patient := models.AssignmentPatient{
+		FullName:               body.FullName,
+		Address:                body.Address,
+		ContactNumber:          body.ContactNumber,
+		Dob:                    body.Dob,
+		EmergencyContactNumber: body.EmergencyContactNumber,
+		Gender:                 body.Gender,
+		ReasonForVisit:         body.ReasonForVisit,
+		RegisteredDateTime:     body.RegisteredDateTime,
+		Symptoms:               body.Symptoms,
+	}
+
+	result := initializers.DB.Create(&patient)
+
+	fmt.Printf("userID %v", result)
+
+	// Handle database errors
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add patient to database"})
+		return
+	}
+
+	// return
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Added Patient",
+		"newpatient": patient,
+	})
+}
+
+func GetAllPatients(c *gin.Context) {
+	var Patients []models.AssignmentPatient
+
+	result := initializers.DB.Find(&Patients)
+
+	// Check for errors
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to retrieve patients from the database",
+		})
+		return
+	}
+
+	// Return the list of patients
+	c.JSON(http.StatusOK, gin.H{
+		"patients": Patients,
 	})
 }
